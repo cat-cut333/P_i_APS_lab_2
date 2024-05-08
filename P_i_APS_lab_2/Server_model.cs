@@ -49,11 +49,25 @@ namespace P_i_APS_lab_2
              arr_client.Add(new Client(name_client, socket_client)); 
         }
 
-        public void BroadcastMessage(string message)
+        public void BroadcastMessage(string message, int flag)
         {
-
-
-            byte[] data_byte = Encoding.ASCII.GetBytes(message);
+            byte[] data_byte;
+            if (flag==0)
+            {
+                data_byte = Encoding.UTF8.GetBytes("0"+ message); //простое сообщение
+            }
+          else  if(flag==1)
+            {
+                data_byte = Encoding.UTF8.GetBytes("1" + message); /// добавление пользователя
+            }
+          else if(flag == 2)
+            {
+                data_byte = Encoding.UTF8.GetBytes("2" + message);//удаление пользователя
+            }
+            else
+            {
+                return ;
+            }
             Client client;
 
             for (int i = 0; i < arr_client.Count(); i++)
@@ -95,6 +109,21 @@ namespace P_i_APS_lab_2
             return arr_client.Count();
         }
 
-       
+        public void Send_list_client(Socket tcpClient)
+        {
+            byte[] data_byte;
+            data_byte = Encoding.UTF8.GetBytes("3" );
+            tcpClient.Send(data_byte);
+            for (int i = 0; i < arr_client.Count(); i++)
+            {
+               
+                        data_byte = Encoding.UTF8.GetBytes("/" + arr_client[i].Get_name()); 
+                         tcpClient.Send(data_byte);
+
+                
+
+            }
+
+        }
     }
 }

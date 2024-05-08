@@ -75,34 +75,40 @@ namespace P_i_APS_lab_2
            
 
             bool Active = true;
-            byte[] data1 = new byte[1024] ;
-            tcpClient.Receive(data1);
-            string name_client = Encoding.ASCII.GetString(data1);
+            byte[] data = new byte[128] ;
+            tcpClient.Receive(data);
+            string name_client = Encoding.UTF8.GetString(data);
             name_client = name_client.Replace("\0", string.Empty);
-            obj_server_View.Print_message("Клиент <<" + name_client+">> подключился");
+            obj_server_View.Print_message("Пользователь <<" + name_client+">> подключился");
+            obj_server_Model.BroadcastMessage(name_client, 1);
+
+            obj_server_Model.BroadcastMessage("Пользователь <<" + name_client + ">> подключился",0);
+
             obj_server_Model.Add_client(name_client, tcpClient);
+            obj_server_Model.Send_list_client(tcpClient);
 
             while (Active)
             {
                 try
                 {
-                   
-                   if(tcpClient.Receive(data1)>0)
+                    byte[] data1 = new byte[1024];
+                    if (tcpClient.Receive(data1)>0)
                     {
-                        string someString = Encoding.ASCII.GetString(data1);
+                        string someString = Encoding.UTF8.GetString(data1);
                         someString = someString.Replace("\0", string.Empty);
-                        obj_server_Model.BroadcastMessage(someString);
+                        obj_server_Model.BroadcastMessage(someString,0);
                         obj_server_View.Print_message("Клиент <<" + name_client + ">> отправил сообщение");
-                       
+
                     }
-                   
-                   
+
+
                 }
                 catch
                 {
                     string someString2 = "Пользователь <<" + name_client + ">> покинул чат";
                     obj_server_Model.Del_client(name_client);
-                    obj_server_Model.BroadcastMessage(someString2);
+                    obj_server_Model.BroadcastMessage(name_client, 2);
+                    obj_server_Model.BroadcastMessage(someString2,0);
                     obj_server_View.Display_message_client_is_disconnected(name_client);
                     Active = false;
 
